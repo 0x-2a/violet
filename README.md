@@ -1,2 +1,3 @@
 # violet
-A shy art experience
+
+Shy art that hides when people get too close.

@@ -275,7 +275,7 @@ func (rpl *RPLidar) StartScan(scanCycles int) ([]*RPLidarPoint, error) {
 
 // StartScan begins a lidar scan for the amount of scan cycles desired.
 // The scans parameter refers to how many scan cycles will occur.
-func (rpl *RPLidar) StartScanFn(scanFn func(*RPLidarPoint)) error {
+func (rpl *RPLidar) StartScanFn(scanFn func(*RPLidarPoint) bool) error {
 	if !rpl.Connected {
 		return errors.New("The device is not connected")
 	}
@@ -301,7 +301,10 @@ func (rpl *RPLidar) StartScanFn(scanFn func(*RPLidarPoint)) error {
 		rpl.Scanning = true
 		if quality > 0 && distance > 0 {
 			x, y := distanceAngleToCartesian(angle, distance)
-			scanFn(&RPLidarPoint{quality, angle, distance, x, y})
+			stop := scanFn(&RPLidarPoint{quality, angle, distance, x, y})
+			if stop {
+				break
+			}
 		}
 	}
 

@@ -26,32 +26,12 @@ func main() {
 		}
 	}()
 
-	// info, err := lidar.DeviceInfo()
-	// log.Print(info)
-	//
-	// status, errcode, err := lidar.Health()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// } else if status == "Warning" {
-	// 	log.Printf("Lidar status: %v Error Code: %v\n", status, errcode)
-	// } else if status == "Error" {
-	// 	log.Fatalf("Lidar status: %v Error Code: %v\n", status, errcode)
-	// }
-	// lidar.StartMotor()
-
-	// time.Sleep(10 * time.Second)
-
 	points := make(chan *rplidar.RPLidarPoint)
 	var wg sync.WaitGroup
 	wg.Add(2)
 
 	go listen(lidar, points)
 	go handlePoint(points)
-	// for _, p := range scanResults {
-	// 	fmt.Printf("Quality: %v\tAngle: %.2f\tDistance: %.2f\n", p.Quality, p.Angle, p.Distance)
-	// }
-
-	// lidar.StopMotor()
 
 	wg.Wait()
 }
@@ -62,17 +42,22 @@ func DebugTimestamp(ts int64) string {
 
 func handlePoint(points chan *rplidar.RPLidarPoint){
 	count := 0
-	iter := 1000
+	iter := 10
+	var pointArr = [361]string{}
 
-	lastTime := time.Now()
-	for i := range points {
+	for p := range points {
 		count++
-		_ = i
+		_ = p
+
+		present := "____"
+		if int(p.Distance) < 2200 {
+			present = "****"
+		}
+
+		pointArr[360-int(p.Angle)] = present
+
 		if count%iter == 0 {
-			now := time.Now()
-			timeDiff := now.Sub(lastTime).Seconds()
-			lastTime = now
-			fmt.Printf("%s %d %f per second\n", DebugTimestamp(now.Unix()), count, float32(iter)/float32(timeDiff))
+			fmt.Println(pointArr[310:])
 		}
 
 		// if p.Angle < 1 {`

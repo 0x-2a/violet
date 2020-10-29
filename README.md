@@ -1,3 +1,3 @@
 # violet
 
-Shy art that hides when people get too close.
+Hides when anyone gets too close
